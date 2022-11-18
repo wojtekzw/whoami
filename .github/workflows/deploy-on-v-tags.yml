@@ -16,6 +16,10 @@ env:
 jobs:
   build-backedn-docker-image:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        # working-directory: backend
     steps:
       - name: Debug backend
         run: |
@@ -42,6 +46,10 @@ jobs:
 
   build-frontend-docker-image:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        # working-directory: frontend
     steps:
       - name: Debug frontend
         run: |
@@ -51,10 +59,14 @@ jobs:
     runs-on: self-hosted
     needs: [build-backedn-docker-image, build-frontend-docker-image]
     steps:
+      - name: Deploy date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d %H:%M')"
       - name: Debug
         run: |
           echo ${{github.ref_name}}
           echo ${{github.trigger_name}}
+          echo "Deploy date: ${{ steps.date.output.date}}"
           id
       - name: Checkout
         uses: actions/checkout@v3

@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  faq-backend:
+    image: wojtekz/whoami:$TAG
+    environment:
+      - DEPLOYMENT_DATE=${DEPLOYMENT_DATE:-stack}
+    deploy:
+      restart_policy:
+        condition: any
+        delay: 5s
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.${SERVICE_NAME_BACKEND}-ssl.entryPoints=port443"
+        - "traefik.http.routers.${SERVICE_NAME_BACKEND}-ssl.rule=host(`${SERVICE_NAME_BACKEND}.${DOMAIN_SUFFIX}`)"
+        - "traefik.http.routers.${SERVICE_NAME_BACKEND}-ssl.tls=true"
+        - "traefik.http.routers.${SERVICE_NAME_BACKEND}-ssl.tls.certResolver=le-ssl"
+        - "traefik.http.routers.${SERVICE_NAME_BACKEND}-ssl.service=${SERVICE_NAME_BACKEND}-ssl-lb"
+        - "traefik.http.services.${SERVICE_NAME_BACKEND}-ssl-lb.loadBalancer.server.port=80"
+        - "traefik.http.middlewares.${SERVICE_NAME_BACKEND}-compress.compress=true"
+        - "traefik.http.routers.${SERVICE_NAME_BACKEND}-ssl.middlewares=${SERVICE_NAME_BACKEND}-compress"
+
+    networks:
+      - traefik-net
+
+networks:
+  traefik-net:
+    external: true

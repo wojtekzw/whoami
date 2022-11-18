@@ -37,12 +37,13 @@ jobs:
 
   deploy-container-on-s1:
     runs-on: self-hosted
+    needs: build-docker-image
     steps:
       - name: Debug
         run: |
           echo ${{github.ref_name}}
           echo ${{github.trigger_name}}
-          echo id
+          id
       - name: Run container
         run: |
           docker ps

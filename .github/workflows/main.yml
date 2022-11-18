@@ -42,6 +42,7 @@ jobs:
         run: |
           echo ${{github.ref_name}}
           echo ${{github.trigger_name}}
+          echo id
       - name: Run container
         run: |
           docker ps

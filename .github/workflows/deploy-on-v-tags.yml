@@ -5,7 +5,7 @@ on:
     tags:
       - "v*"
 env:
-  IMAGE_NAME: ${{ secrets.DOCKER_HUB_USERNAME }}/whoami
+  IMAGE_NAME_BACKEND: ${{ secrets.DOCKER_HUB_USERNAME }}/whoami
   CONTAINER_NAME: whoami-test
   DOMAIN_SUFFIX: dev.digitdrop.pl
   SERVICE_NAME_BACKEND: faq-backend
@@ -13,10 +13,10 @@ env:
   DESTINATION_STACK_PATH: .
 
 jobs:
-  build-docker-image:
+  build-backedn-docker-image:
     runs-on: ubuntu-latest
     steps:
-      - name: Debug
+      - name: Debug backend
         run: |
           echo ${{github.ref_name}}
           echo ${{github.trigger_name}}
@@ -36,12 +36,19 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ${{ env.IMAGE_NAME }}:latest
-            ${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+            ${{ env.IMAGE_NAME_BACKEND }}:latest
+            ${{ env.IMAGE_NAME_BACKEND }}:${{ github.ref_name }}
 
-  deploy-container-on-s1:
+  build-frontend-docker-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Debug frontend
+        run: |
+          echo "frontend"
+
+  deploy-app-on-s1:
     runs-on: self-hosted
-    needs: build-docker-image
+    needs: [build-backedn-docker-image, build-frontend-docker-image]
     steps:
       - name: Debug
         run: |
@@ -56,7 +63,7 @@ jobs:
       #     docker ps
       #     docker version
       #     docker rm -f $CONTAINER_NAME
-      #     docker run -d -p 8000:80 --name ${{ env.CONTAINER_NAME }} ${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+      #     docker run -d -p 8000:80 --name ${{ env.CONTAINER_NAME }} ${{ env.IMAGE_NAME_BACKEND }}:${{ github.ref_name }}
       #     docker ps
 
       - name: Deploy  docker stack

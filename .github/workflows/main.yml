@@ -49,5 +49,5 @@ jobs:
           docker ps
           docker version
           docker rm -f $CONTAINER_NAME
-          docker run -d -p 8000:80 ${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+          docker run -d -p 8000:80 --name ${{ env.CONTAINER_NAME }} ${{ env.IMAGE_NAME }}:${{ github.ref_name }}
           docker ps

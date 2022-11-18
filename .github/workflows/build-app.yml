@@ -1,9 +1,9 @@
-name: Go package
+name: Build Go app
 
 on: [push]
 
 jobs:
-  build:
+  build-test-app:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3

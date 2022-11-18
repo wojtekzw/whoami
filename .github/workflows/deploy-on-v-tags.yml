@@ -81,7 +81,9 @@ jobs:
 
       - name: Deploy  docker stack
         run: |
+          DEPLOYMENT_DATE=${{ steps.date.output.date}}
           pwd
           envsubst < faq-stack.yml > ${DESTINATION_STACK_PATH}/faq-deploy.yml
           docker stack deploy -c ${DESTINATION_STACK_PATH}/faq-deploy.yml faq
           docker ps
+          echo "DEPLOYMENT_DATE=$DEPLOYMENT_DATE"

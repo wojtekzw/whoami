@@ -68,6 +68,7 @@ jobs:
 
       - name: Deploy  docker stack
         run: |
-          envsubst < faq-stack.yml >$DESTINATION_STACK_PATH/faq-deploy.yml
+          pwd
+          cat faq-stack.yml | envsubst  > $DESTINATION_STACK_PATH/faq-deploy.yml
           docker stack deploy -c $DESTINATION_STACK_PATH/faq-deploy.yml faq
           docker ps

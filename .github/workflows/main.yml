@@ -1,5 +1,5 @@
-name: build image
-run-name: ${{ github.actor }} - ${{ github.event.head_commit.message }}
+name: build & deploy docker container
+# run-name: ${{ github.actor }} - ${{ github.event.head_commit.message }}
 on:
   push:
     tags:
@@ -7,6 +7,10 @@ on:
 env:
   IMAGE_NAME: ${{ secrets.DOCKER_HUB_USERNAME }}/whoami
   CONTAINER_NAME: whoami-test
+  DOMAIN_SUFFIX: dev.digitdrop.pl
+  SERVICE_NAME_BACKEND: faq-backend
+  SERVICE_NAME_FRONTEND: faq
+  DESTINATION_STACK_PATH: .
 
 jobs:
   build-docker-image:
@@ -44,10 +48,19 @@ jobs:
           echo ${{github.ref_name}}
           echo ${{github.trigger_name}}
           id
-      - name: Run container
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # - name: Run container
+      #   run: |
+      #     docker ps
+      #     docker version
+      #     docker rm -f $CONTAINER_NAME
+      #     docker run -d -p 8000:80 --name ${{ env.CONTAINER_NAME }} ${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+      #     docker ps
+
+      - name: Deploy  docker stack
         run: |
-          docker ps
-          docker version
-          docker rm -f $CONTAINER_NAME
-          docker run -d -p 8000:80 --name ${{ env.CONTAINER_NAME }} ${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+          envsubst < faq-stack.yml >$DESTINATION_STACK_PATH/faq-deploy.yml
+          docker stack -f $DESTINATION_STACK_PATH/faq-deploy.yml faq
           docker ps

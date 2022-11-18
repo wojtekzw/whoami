@@ -10,7 +10,8 @@ env:
   DOMAIN_SUFFIX: dev.digitdrop.pl
   SERVICE_NAME_BACKEND: faq-backend
   SERVICE_NAME_FRONTEND: faq
-  DESTINATION_STACK_PATH: ./
+  DESTINATION_STACK_PATH: .
+  TAG: ${{ github.ref_name }}
 
 jobs:
   build-backedn-docker-image:
@@ -69,6 +70,6 @@ jobs:
       - name: Deploy  docker stack
         run: |
           pwd
-          cat faq-stack.yml | envsubst  > ${DESTINATION_STACK_PATH}faq-deploy.yml
-          docker stack deploy -c ${DESTINATION_STACK_PATH}faq-deploy.yml faq
+          envsubst < faq-stack.yml > ${DESTINATION_STACK_PATH}/faq-deploy.yml
+          docker stack deploy -c ${DESTINATION_STACK_PATH}/faq-deploy.yml faq
           docker ps
